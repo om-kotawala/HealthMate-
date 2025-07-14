@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Manage Appointments</title>
+    <link rel="stylesheet" href="../css/admin.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Manage Appointments</h1>
+      <table id="appointmentsTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Appointments will be loaded here -->
+        </tbody>
+      </table>
+    </div>
+    <script>
+      $(document).ready(function () {
+        loadAppointments();
+
+        function loadAppointments() {
+          $.ajax({
+            url: "../api/appointments.php",
+            method: "GET",
+            success: function (data) {
+              var appointments = JSON.parse(data);
+              var rows = "";
+              $.each(appointments, function (index, appointment) {
+                rows += "<tr>";
+                rows += "<td>" + appointment.id + "</td>";
+                rows += "<td>" + appointment.user_id + "</td>";
+                rows += "<td>" + appointment.date + "</td>";
+                rows += "<td>" + appointment.time + "</td>";
+                rows += "<td>" + appointment.status + "</td>";
+                rows +=
+                  '<td><button class="delete-btn" onclick="deleteAppointment(' +
+                  appointment.id +
+                  ')">Delete</button></td>';
+                rows += "</tr>";
+              });
+              $("#appointmentsTable tbody").html(rows);
+            },
+          });
+        }
+
+        window.deleteAppointment = function (id) {
+          if (confirm("Are you sure you want to delete this appointment?")) {
+            $.ajax({
+              url: "../api/appointments.php?id=" + id,
+              method: "DELETE",
+              success: function (data) {
+                alert("Appointment deleted");
+                loadAppointments();
+              },
+            });
+          }
+        };
+      });
+    </script>
+  </body>
+</html>
